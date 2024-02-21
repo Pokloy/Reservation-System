@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+          integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" th:href="@{/css/index.css}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    
+    <title>Reservation System</title>
+</head>
+<body>
+   <!--  globally set the reservationForm as th:object -->
+	<div class="main m-3" th:object="${reservationForm}">
+	    <div class="p-5" >
+	    	<div class="bullitb text-center">
+	           <h1 class="p-3" >Reservation System</h1>
+	       </div>
+      		
+	       <div class="d-flex align-items-center justify-content-center mt-5">
+    		 	<div class="container">
+    		 	 <div class="row mb-4 mt-3">
+    		 	 <div class="row  col-12 mb-3">
+		            <form th:action="@{/logout}" method="POST" class="align-items-end">
+                 	<!-- Log-out Button for user -->
+		                <input type="submit" value="Logout" class="p-1 btn btn-danger">	               
+		            </form>
+	            </div>
+					    <div class="row">
+					 		<!-- Button for Previous Date -->
+					        <form th:action="@{/main/main/date}" method="post" class="pr-3 col-6">
+					            <input type="hidden" name="changeDate" th:value="previous" />
+					            <input type="submit" class="px-3 py-1 btn btn-primary" value="Previous Day" />
+					        </form>
+					        
+					       <!--  Button for Next Date --> 
+					        <form th:action="@{/main/main/date}" method="post" class="col-6">
+					            <input type="hidden" name="changeDate" th:value="next" />
+					            <input type="submit" class="px-3 py-1 btn btn-primary" value="Next Day" />
+					        </form>	
+				        </div>				  
+					</div>
+					
+    		 		<!-- Form for deletion and Adding -->
+					<form th:action="@{/main/deleted}" method="POST" id="reservationForm" class="row">
+					<div class="row">
+					    <!-- Displays Date -->
+					    <p th:value="${currentDate}" th:text="${'Date:  ' + currentDate}" class="col-12"> </p>
+					 	
+					 	<!-- Input used for date change -->
+					    <input type="hidden" id="currentDateInput" name="currentDate" th:value="${currentDate}" />
+ 						
+ 						<!-- Input used for checked checkbox -->
+ 						<input type="hidden" id="uncheckedCheckboxIdInput" name="uncheckedCheckboxIds" th:value="${uncheckedCheckboxIds}" />
+						
+						<!-- p tag used in current log-in user -->
+					    <p th:text="${'Welcome: ' + user.name}" class="col-12"></p>
+					  </div>  
+					  		<table class="table table-bordered">
+					        <thead>
+					            <tr>
+					                <th scope="col"></th>
+					                 <!-- places the value of availTime to the table header -->
+					                 <th scope="col" th:each="hour : ${availTime}" th:text="${hour.name}"></th>
+					            </tr>
+					        </thead>
+					        <tbody>
+					        	<!-- places the value of the availRooms and iterate the available room to the table row -->
+								<tr th:each="room, roomStat : ${availRooms}">
+									<!-- displays the room on the table header-->
+								    <th scope="row" th:text="${room.name}"></th>
+									<!-- iterate the value of the available time in the table data -->
+								    <td th:each="hour, hourStat : ${availTime}">
+								        <!-- th:id = sets the id as dynamic generation for checkboxes that based on availroom,availtime and date -->
+								        <!-- th:name: = sets the name of checkbox -->
+								        <!-- th:value = set the value of the checkbox that is based on room id, time id and current date -->
+								        <!-- th:checked = calculates the correct position of checkbox thru calculation of timeslot and room id -->
+								        <!-- th:disabled = uses a key/value pair in disasembling the checkboxes. Key the one determine the position and value determines the boolean -->
+								       	<!-- onchange = used for js function that determine if this is for add or delete based on checkbox state -->
+								        <input type="checkbox"								     
+								               th:id="${'checkbox_' + roomStat.index + '_' + hour.id + '_' + currentDateInput}"
+								               th:name="${'selectedHours'}"
+								               th:value="${room.id + '-' + hour.id + '-' + currentDate}"
+								               th:checked="${allDataAndCheckStatus.checkStatusObj[hourStat.index + (roomStat.index * availTime.size())].status}"
+								               th:disabled="${reservationOwnershipMap[room.id + '-' + hour.id]}"
+								               class="p-1 custom-checkbox"
+								               onchange="updateFormAction(this)">
+								    </td>
+								</tr>
+					        </tbody>
+					    </table>
+					    <input type="submit" class="px-3 py-1 btn btn-primary btn-lg" value="Reserved/Cancel">
+					</form>
+	       		</div>	
+	       </div>
+	    </div>
+    </div>
+ <script type="text/javascript" th:src="@{/main/main.js}"></script>
+ <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
